@@ -14,6 +14,7 @@ import {
 } from '@/contracts';
 import { useAppSelector } from '@/hooks';
 import { useActiveLocale } from '@/hooks/useActivateLocale';
+import { defaultChain } from '@/wagmi';
 import { Auction } from '@/wrappers/nounsAuction';
 
 import classes from './Bid.module.css';
@@ -119,14 +120,17 @@ const Bid: React.FC<BidProps> = props => {
     }
 
     const value = parseEther(bidInputRef.current.value);
+    // Explicit chainId: wagmi refuses to submit while the wallet is on another
+    // chain, instead of resolving the address map against that chain.
     placeBid({
       args: [BigInt(auction.nounId)],
       value,
+      chainId: defaultChain.id,
     });
   };
 
   const settleAuctionHandler = () => {
-    settleAuction({});
+    settleAuction({ chainId: defaultChain.id });
   };
 
   const clearBidInput = () => {
