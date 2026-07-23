@@ -21,7 +21,8 @@ const KNOWN_CHAINS: Record<number, string> = {
   11155111: 'Sepolia',
 };
 
-const chainLabel = (id: number) => KNOWN_CHAINS[id] ?? `chain ${id}`;
+const chainLabel = (id: number) =>
+  id === defaultChain.id ? defaultChain.name : (KNOWN_CHAINS[id] ?? `chain ${id}`);
 
 const targetChainId = defaultChain.id;
 
@@ -51,7 +52,7 @@ const NetworkAlert = () => {
       </Modal.Header>
       <Modal.Body>
         <p>
-          Your wallet is connected to <b>{currentLabel}</b>. Nouns DAO auctions require{' '}
+          Your wallet is connected to <b>{currentLabel}</b>. Bells auctions require{' '}
           <b>{targetLabel}</b> to participate.
         </p>
         <Button
@@ -64,13 +65,18 @@ const NetworkAlert = () => {
         </Button>
         {switchError && (
           <>
+            <p className="mt-3 text-sm text-red-600">{switchError}</p>
             <p className="mt-3">
-              <b>If your wallet didn&apos;t prompt, switch networks manually:</b>
+              <b>If your wallet didn&apos;t prompt, add the network manually:</b>
             </p>
             <ol>
-              <li>Open your wallet</li>
-              <li>Click the network select dropdown</li>
-              <li>Select &quot;{targetLabel}&quot;</li>
+              <li>Open your wallet and click the network dropdown</li>
+              <li>Choose &quot;Add a custom network&quot;</li>
+              <li>
+                Name: {targetLabel} — Chain ID: {targetChainId}
+              </li>
+              <li>RPC: https://rpc.testnet.chain.robinhood.com</li>
+              <li>Currency: ETH — Explorer: https://explorer.testnet.chain.robinhood.com</li>
             </ol>
           </>
         )}
