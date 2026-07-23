@@ -48,6 +48,15 @@ const config: HardhatUserConfig = {
     hardhat: {
       initialBaseFeePerGas: 0,
     },
+    robinhoodTestnet: {
+      url: process.env.ROBINHOOD_TESTNET_RPC ?? 'https://rpc.testnet.chain.robinhood.com',
+      chainId: 46630,
+      accounts: [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),
+      // Legacy gas price, ~10× the chain's ~0.01 gwei base fee. Without it,
+      // ethers assumes a 1.5 gwei priority fee and the upfront
+      // gasLimit×maxFeePerGas balance check fails on big-calldata txs.
+      gasPrice: 100_000_000,
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,

@@ -562,6 +562,7 @@ export const nounsTokenAbi = [
 export const nounsTokenAddress = {
   1: '0x9C8fF314C9Bc7F6e59A9d9225Fb22946427eDC03',
   11155111: '0x4C4674bb72a096855496a7204962297bd7e12b85',
+  46630: '0x7e48DB750064da711d8d0A646f9D410e4b93Bb8d',
 } as const
 
 /**

@@ -497,6 +497,7 @@ export const nounsDataAbi = [
 export const nounsDataAddress = {
   1: '0xf790A5f59678dd733fb3De93493A91f472ca1365',
   11155111: '0x9040f720AA8A693F950B9cF94764b4b06079D002',
+  46630: '0xB459ffb9f4eb943250951AC400003aA083E50f50',
 } as const
 
 /**

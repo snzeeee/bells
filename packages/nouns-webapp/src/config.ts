@@ -1,5 +1,7 @@
 import { hardhat, mainnet, sepolia } from 'viem/chains';
 
+const ROBINHOOD_TESTNET_ID = 46630 as const;
+
 interface ContractParameters {
   executor: {
     GRACE_PERIOD_SECONDS: number;
@@ -12,7 +14,11 @@ interface AppConfig {
   enableHistory: boolean;
 }
 
-type SupportedChains = typeof mainnet.id | typeof hardhat.id | typeof sepolia.id;
+type SupportedChains =
+  | typeof mainnet.id
+  | typeof hardhat.id
+  | typeof sepolia.id
+  | typeof ROBINHOOD_TESTNET_ID;
 
 interface CacheBucket {
   name: string;
@@ -71,6 +77,12 @@ const app: Record<SupportedChains, AppConfig> = {
     subgraphApiUri: 'http://localhost:8000/subgraphs/name/nounsdao/nouns-subgraph',
     enableHistory: import.meta.env.VITE_ENABLE_HISTORY === 'true',
   },
+  [ROBINHOOD_TESTNET_ID]: {
+    jsonRpcUri: import.meta.env.VITE_ROBINHOOD_JSONRPC ?? 'https://rpc.testnet.chain.robinhood.com',
+    wsRpcUri: import.meta.env.VITE_ROBINHOOD_WSRPC ?? '',
+    subgraphApiUri: import.meta.env.VITE_ROBINHOOD_SUBGRAPH ?? '',
+    enableHistory: import.meta.env.VITE_ENABLE_HISTORY === 'true',
+  },
 };
 
 const contractParameters: Record<SupportedChains, ContractParameters> = {
@@ -85,6 +97,11 @@ const contractParameters: Record<SupportedChains, ContractParameters> = {
     },
   },
   [hardhat.id]: {
+    executor: {
+      GRACE_PERIOD_SECONDS: 1814400,
+    },
+  },
+  [ROBINHOOD_TESTNET_ID]: {
     executor: {
       GRACE_PERIOD_SECONDS: 1814400,
     },

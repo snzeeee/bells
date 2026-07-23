@@ -200,6 +200,7 @@ export const nounsLegacyTreasuryAbi = [
 export const nounsLegacyTreasuryAddress = {
   1: '0x0BC3807Ec262cB779b38D65b38158acC3bfedE10',
   11155111: '0x332db58b51393f3a6b28d4DD8964234967e1aD33',
+  46630: '0x161ab84438Fee3DDc678a2F5833252089be2Dfc3',
 } as const
 
 /**

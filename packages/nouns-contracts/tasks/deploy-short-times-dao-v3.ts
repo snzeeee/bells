@@ -292,9 +292,11 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
       let gasOptions;
       const feeData = await ethers.provider.getFeeData();
       if (args.autoDeploy) {
+        // Legacy gasPrice from the node, ×2 headroom. ethers' getFeeData()
+        // assumes a 1.5 gwei priority fee, which on near-free Orbit chains
+        // inflates the upfront gasLimit×maxFeePerGas balance check ~100×.
         gasOptions = {
-          maxFeePerGas: feeData.maxFeePerGas,
-          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+          gasPrice: (await ethers.provider.getGasPrice()).mul(2),
         };
       } else {
         gasOptions = {
@@ -340,12 +342,25 @@ task('deploy-short-times-dao-v3', 'Deploy all Nouns contracts with short gov tim
         libraries: contract?.libraries?.(),
       });
 
-      const deploymentGas = await factory.signer.estimateGas(
-        factory.getDeployTransaction(
-          ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
-          gasOptions,
-        ),
-      );
+      // On Arbitrum Orbit chains (e.g. Robinhood Chain), eth_estimateGas
+      // undershoots for large creation code ("contract creation code storage
+      // out of gas"). Pad the estimate generously — unused gas is refunded.
+      let deploymentGas;
+      try {
+        deploymentGas = await factory.signer.estimateGas(
+          factory.getDeployTransaction(
+            ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
+            gasOptions,
+          ),
+        );
+      } catch {
+        deploymentGas = ethers.BigNumber.from(10_000_000);
+      }
+      if (args.autoDeploy) {
+        const padded = deploymentGas.mul(4);
+        const blockGasLimit = ethers.BigNumber.from(30_000_000);
+        gasOptions.gasLimit = padded.gt(blockGasLimit) ? blockGasLimit : padded;
+      }
 
       if (!args.autoDeploy) {
         const deploymentCost = deploymentGas.mul(gasOptions.gasPrice!);

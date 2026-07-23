@@ -1,15 +1,34 @@
 import { find, pipe } from 'remeda';
+import { defineChain } from 'viem';
 import { createConfig, http, fallback, webSocket } from 'wagmi';
 import { mainnet, sepolia } from 'wagmi/chains';
 import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors';
 
 import { CHAIN_ID, WALLET_CONNECT_V2_PROJECT_ID } from './config';
 
+export const robinhoodTestnet = defineChain({
+  id: 46630,
+  name: 'Robinhood Chain Testnet',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [import.meta.env.VITE_ROBINHOOD_JSONRPC ?? 'https://rpc.testnet.chain.robinhood.com'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Blockscout',
+      url: 'https://explorer.testnet.chain.robinhood.com',
+    },
+  },
+  testnet: true,
+});
+
 const activeChainId = Number(CHAIN_ID);
 
 const activeChain =
   pipe(
-    [mainnet, sepolia],
+    [mainnet, sepolia, robinhoodTestnet],
     find(chain => chain.id === activeChainId),
   ) ?? sepolia;
 
@@ -30,6 +49,9 @@ const transports = {
       ? [http(import.meta.env.VITE_SEPOLIA_JSONRPC)]
       : []),
   ]),
+  [robinhoodTestnet.id]: http(
+    import.meta.env.VITE_ROBINHOOD_JSONRPC ?? 'https://rpc.testnet.chain.robinhood.com',
+  ),
 };
 
 export const config = createConfig({
@@ -42,8 +64,7 @@ export const config = createConfig({
       showQrModal: false,
     }),
     coinbaseWallet({
-      appName: 'Nouns.WTF',
-      appLogoUrl: 'https://nouns.wtf/static/media/logo.cdea1650.svg',
+      appName: 'Bells',
     }),
   ],
 });

@@ -18,7 +18,10 @@ task('populate-descriptor', 'Populates the descriptor with color palettes and No
     types.string,
   )
   .setAction(async ({ nftDescriptor, nounsDescriptor }, { ethers, network }) => {
-    const options = { gasLimit: network.name === 'hardhat' ? 30000000 : undefined };
+    // Explicit gas limit on hardhat and on Arbitrum Orbit chains (e.g.
+    // Robinhood testnet), where eth_estimateGas undershoots for large calldata.
+    const useExplicitGas = network.name === 'hardhat' || network.name === 'robinhoodTestnet';
+    const options = { gasLimit: useExplicitGas ? 30000000 : undefined };
 
     const descriptorFactory = await ethers.getContractFactory('NounsDescriptorV3', {
       libraries: {
